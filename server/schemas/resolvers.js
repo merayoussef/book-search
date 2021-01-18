@@ -1,10 +1,6 @@
 const { AuthenticationError } = require('apollo-server-express');
 const { signToken } = require('../utils/auth');
-
-const { AuthenticationError } = require('apollo-server-express');
 const { User } = require('../models');
-const { signToken } = require('../utils/auth');
-const bookSchema = require('../models/Book');
 
 const resolvers = {
     Query: {
@@ -12,8 +8,7 @@ const resolvers = {
             if (context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
-                    .populate('thoughts')
-                    .populate('friends');
+                    .populate('books')
 
                 return userData;
             }
@@ -23,14 +18,12 @@ const resolvers = {
         createUser: async() => {
             return User.create()
                 .select('-__v -password')
-                .populate('thoughts')
-                .populate('friends');
+
         },
         user: async(parent, { username }) => {
             return User.findOne({ username })
                 .select('-__v -password')
-                .populate('friends')
-                .populate('thoughts');
+                .populate('books')
         },
         saveBook: async(parent, { username }) => {
             const params = username ? { username } : {};
